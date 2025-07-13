@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>balani sale agencies</title>
+    <link rel="stylesheet" href="style2.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        /* Paste your CSS here or keep it in style2.css */
+        
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            padding: 30px;
+            max-width: 600px;
+            margin: auto;
+            color: #333;
+        }
+        
+        h2 {
+            text-align: center;
+            color: #222;
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+            color: #444;
+        }
+        
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 6px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            transition: border 0.3s;
+        }
+        
+        input:focus {
+            border-color: #4caf50;
+            outline: none;
+        }
+        
+        button {
+            margin-top: 20px;
+            padding: 14px;
+            width: 100%;
+            font-size: 16px;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        
+        button:hover {
+            background-color: #45a049;
+        }
+        
+        .output {
+            margin-top: 30px;
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        
+        .output span {
+            display: block;
+            margin-bottom: 8px;
+            color: #222;
+        }
+        
+        hr {
+            margin: 15px 0;
+            border: none;
+            border-top: 1px solid #e0e0e0;
+        }
+        /* PDF-specific styles */
+        
+        #billContent {
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            font-size: 16px;
+            color: #111;
+        }
+        
+        #billContent span {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+        
+        #billContent hr {
+            border-top: 1px dashed #ccc;
+            margin: 12px 0;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                box-shadow: none;
+            }
+            .output {
+                box-shadow: none;
+                border: none;
+            }
+            button {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Steel Rate Calculator</h2>
+
+    <label for="basicRate">Basic Rate (₹ per ton)</label>
+    <input type="number" id="basicRate" placeholder="Enter basic rate" />
+
+    <label for="qty8mm">8mm Quantity (tons)</label>
+    <input type="number" id="qty8mm" step="0.001" placeholder="e.g., 1.170" />
+
+    <label for="qty10mm">10mm Quantity (tons)</label>
+    <input type="number" id="qty10mm" step="0.001" placeholder="e.g., 0.750" />
+
+    <label for="qty12mm">12mm Quantity (tons)</label>
+    <input type="number" id="qty12mm" step="0.001" placeholder="e.g., 3.100" />
+
+    <label for="qty16mm">16mm Quantity (tons)</label>
+    <input type="number" id="qty16mm" step="0.001" placeholder="e.g., 1.000" />
+
+    <label for="qty20mm">20mm Quantity (tons)</label>
+    <input type="number" id="qty20mm" step="0.001" placeholder="e.g., 2.000" />
+
+    <label for="qty25mm">25mm Quantity (tons)</label>
+    <input type="number" id="qty25mm" step="0.001" placeholder="e.g., 1.500" />
+
+    <button onclick="calculateBill()">Calculate Bill</button>
+    <button onclick="downloadPDF()">Download PDF</button>
+
+    <div class="output" id="result"></div>
+
+    <script>
+        function calculateBill() {
+            const basicRate = parseFloat(document.getElementById("basicRate").value);
+            const qty8mm = parseFloat(document.getElementById("qty8mm").value) || 0;
+            const qty10mm = parseFloat(document.getElementById("qty10mm").value) || 0;
+            const qty12mm = parseFloat(document.getElementById("qty12mm").value) || 0;
+            const qty16mm = parseFloat(document.getElementById("qty16mm").value) || 0;
+            const qty20mm = parseFloat(document.getElementById("qty20mm").value) || 0;
+            const qty25mm = parseFloat(document.getElementById("qty25mm").value) || 0;
+
+            if (isNaN(basicRate) || basicRate <= 0) {
+                alert("Please enter a valid Basic Rate.");
+                return;
+            }
+
+            // Calculate final rates with adjustments and GST
+            const base8mm = basicRate + 6500 - 4000 + 160;
+            const rate8mmWithoutGST = base8mm - (base8mm * 0.015);
+            const finalRate8mm = rate8mmWithoutGST * 1.18;
+
+            const baseOther = basicRate + 5500 - 4000 + 160;
+            const rateOtherWithoutGST = baseOther - (baseOther * 0.015);
+            const finalRateOther = rateOtherWithoutGST * 1.18;
+
+            // Calculate totals for each size
+            const total8mm = finalRate8mm * qty8mm;
+            const total10mm = finalRateOther * qty10mm;
+            const total12mm = finalRateOther * qty12mm;
+            const total16mm = finalRateOther * qty16mm;
+            const total20mm = finalRateOther * qty20mm;
+            const total25mm = finalRateOther * qty25mm;
+
+            // Calculate subtotal and GST breakdown
+            const subTotal = total8mm + total10mm + total12mm + total16mm + total20mm + total25mm;
+            const beforeGST = subTotal / 1.18;
+            const gstAmount = subTotal - beforeGST;
+            const cgst = gstAmount / 2;
+            const sgst = gstAmount / 2;
+
+            // Show the result
+            document.getElementById("result").innerHTML = `
+                <div id="billContent">
+                    <span><strong>8mm Final Rate:</strong> ₹${finalRate8mm.toFixed(2)} / ton</span>
+                    <span><strong>10–25mm Final Rate:</strong> ₹${finalRateOther.toFixed(2)} / ton</span>
+                    <hr>
+                    <span><strong>8mm Total:</strong> ₹${total8mm.toFixed(2)}</span>
+                    <span><strong>10mm Total:</strong> ₹${total10mm.toFixed(2)}</span>
+                    <span><strong>12mm Total:</strong> ₹${total12mm.toFixed(2)}</span>
+                    <span><strong>16mm Total:</strong> ₹${total16mm.toFixed(2)}</span>
+                    <span><strong>20mm Total:</strong> ₹${total20mm.toFixed(2)}</span>
+                    <span><strong>25mm Total:</strong> ₹${total25mm.toFixed(2)}</span>
+                    <hr>
+                    <span><strong>Amount Before GST:</strong> ₹${beforeGST.toFixed(2)}</span>
+                    <span><strong>CGST (9%):</strong> ₹${cgst.toFixed(2)}</span>
+                    <span><strong>SGST (9%):</strong> ₹${sgst.toFixed(2)}</span>
+                    <span><strong>Grand Total (with GST):</strong> ₹${subTotal.toFixed(2)}</span>
+                </div>
+            `;
+        }
+
+        function downloadPDF() {
+            const element = document.getElementById("billContent");
+            if (!element) {
+                alert("Please calculate the bill first.");
+                return;
+            }
+
+            const options = {
+                margin: 0.5,
+                filename: "Steel_Rate_Bill.pdf",
+                image: {
+                    type: "jpeg",
+                    quality: 0.98
+                },
+                html2canvas: {
+                    scale: 2
+                },
+                jsPDF: {
+                    unit: "in",
+                    format: "a4",
+                    orientation: "portrait"
+                },
+            };
+
+            html2pdf().set(options).from(element).save();
+        }
+    </script>
+</body>
+
+</html>
